@@ -1,7 +1,19 @@
 #!/usr/bin/python3.8
 # -*-coding:utf8 -*
 
+class ANSI:
+    R = '\033[1m\033[91m' # Bold red color
+    B = '\033[94m' # Blue
+    C = '\033[96m' # Cyan 
+    G = '\033[92m' # Green
+    END = '\033[0m'
+
 import random
+
+class PreferencesBinomes:
+    #transform the file into a dictionnary of matches and returns it
+    def __init__(self, dico):
+        self.preferences = dico
 
 def fileLength(nomfic):
     try:
@@ -16,8 +28,52 @@ def fileLength(nomfic):
     fhand.close();
     return count;
 
+class ExtensionError(Exception):
+    def __init__(self, f, ext):
+            self.ext = ext
+            self.message = f"File {f} extension not expected. Expected format {ext}."
+            super().__init__(self.message)
+
+class TabulationError(Exception):
+    def __init__(self, f):
+        self.f = f
+        self.message = f"File {f} not properly formed. Tabulation must separate values"
+        super().__init__(self.message)
+
+
 def lirePrefs(nomfic):
-    pass
+    #matrix = list()
+    dico = {}
+    counter = 0
+    
+    try:
+        fhandler = open(nomfic, "r")
+        ext = nomfic.split('.')[-1]
+        if ext != "txt":
+            raise ExtensionError(nomfic, "txt")
+        lines = fhandler.readlines()
+        for line in lines:
+            prenoms = [p.strip('\n') for p in line.split('\t') if p != '']
+            counter = counter + len(prenoms)
+            dico[prenoms[0]] = prenoms[1:]
+            #matrix.append(prenoms)
+
+        if counter <= len(lines):
+            raise TabulationError(nomfic)
+        print("Nous avons dans dico: ", dico)
+
+    except FileNotFoundError as e:
+        print(f"{ANSI.R}File not found{ANSI.END}")
+        print(e)
+    except ExtensionError as e:
+        print(f"{ANSI.R}File {nomfic} doesn't have required extension. Extension required txt. {ANSI.END}")
+        print(e)
+    except TabulationError as e:
+        print(f"{ANSI.R}File {nomfic} doesn't have required format. Names must be separated with a tabulation {ANSI.END}")
+        print(e)
+
+def scoreSimple():
+
 
 def generePrefs(nameFile, prefFile, generationMethod):
     try:
@@ -88,55 +144,7 @@ def method(listePrenom, prenom):
 
     return preference_generated
 
-def prefAlea(listePrenom, prenom):
-    try:
-        fhand = open(listePrenom, "r")
-    except: 
-        print("****File can't be opened: File doesn't exist")
-        quit();
-    file_len = fileLength(listePrenom)
-    if file_len <= 1:
-        print("File can't be empty or contains a single element")
-        quit()
-    arr = nameInArray(listePrenom)
-    print("The array is: ", arr)
-    created_file = open("created.txt", "w")
-    len_liste_prenom = fileLength(listePrenom)
-    print("The length is: ",len_liste_prenom)
-    """
-    
-    """
-    print("////////////// STARTING: ", arr, len(arr))
-    for index, name in enumerate(arr):
-        print("+++++++++++++++ we have: ", index, name)
-        cpy = arr.copy()
-        cpy.remove(cpy[index])
-        len_cpy = len(cpy)
-        print("THE CPY ARR: ", cpy," \n")
-        tmp = []
-        created_file.write(name)
-        #tmp.append(name)
-        #for i in range(0, len_cpy): #here too
-        i = 0
-        while i < len_cpy: #this loop replace the loop above
-            r = random.randrange(0, len_cpy) #replaced line_number with len_cpy
-            #while (index == r):
-                #r = random.randrange(0, len_cpy) #here too
-            print("THE RANDOM NUMBER IS: ",r)
-            tmp.append(cpy[r])
-            cpy.remove(cpy[r])
-            len_cpy = len(cpy)
-            print("NEW LENGHT OF CPY: ", len_cpy, " AND THE ARRAY IS: ",cpy)
-            #i = i + 1
-        print("===============================")
-        print(tmp)
-        #tmp_set = set(tmp)
-        #print(tmp_set)
-        for elt in tmp: #tmp_set replaced by tmp
-            created_file.write("\t"+elt)
-        created_file.write("\n")
-    return created_file
-
 
 if __name__== '__main__':
     generePrefs("listepreferences.csv", "fichierSortie.txt", method)
+    lirePrefs("fichierSortie.txt")
