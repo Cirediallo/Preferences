@@ -1,6 +1,7 @@
 #!/usr/bin/python3.8
 # -*-coding:utf8 -*
 
+
 class ANSI:
     R = '\033[1m\033[91m' # Bold red color
     B = '\033[94m' # Blue
@@ -60,7 +61,7 @@ def lirePrefs(nomfic):
 
         if counter <= len(lines):
             raise TabulationError(nomfic)
-        print("Nous avons dans dico: ", dico)
+        #print("Nous avons dans dico: ", dico)
 
     except FileNotFoundError as e:
         print(f"{ANSI.R}File not found{ANSI.END}")
@@ -72,8 +73,19 @@ def lirePrefs(nomfic):
         print(f"{ANSI.R}File {nomfic} doesn't have required format. Names must be separated with a tabulation {ANSI.END}")
         print(e)
 
-def scoreSimple():
+    return dico
 
+def scoreSimple(dic):
+    scoreBinome = {}
+    score = 0
+    for elt in dic:
+        scoreBinome[elt] = dic[elt].index(random.choice(dic[elt]))
+    print(scoreBinome)
+    for v in scoreBinome.values():
+        score = score + v
+
+    print("Le score est: ", score)
+    return score
 
 def generePrefs(nameFile, prefFile, generationMethod):
     try:
@@ -147,4 +159,5 @@ def method(listePrenom, prenom):
 
 if __name__== '__main__':
     generePrefs("listepreferences.csv", "fichierSortie.txt", method)
-    lirePrefs("fichierSortie.txt")
+    dico_pref = lirePrefs("fichierSortie.txt")
+    scoreSimple(dico_pref)
